@@ -9,7 +9,6 @@ const charts: AppRouteModule = {
   redirect: '/charting_view/echarts/map',
   meta: {
     orderNo: 500,
-    icon: 'ion:bar-chart-outline',
     title: 'charting',
   },
   children: [
