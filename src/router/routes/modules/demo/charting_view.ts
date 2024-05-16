@@ -1,7 +1,6 @@
 import type { AppRouteModule } from '@/router/types';
 
 import { LAYOUT } from '@/router/constant';
-import { t } from '@/hooks/web/useI18n';
 
 const charts: AppRouteModule = {
   path: '/charting_view',
@@ -18,7 +17,7 @@ const charts: AppRouteModule = {
       path: 'charting_library',
       name: 'charting_library',
       meta: {
-        title: t('routes.demo.charts.baiduMap'),
+        title: 'ChartingLibrary',
       },
       component: () => import('@/views/demo/charting/ChartingLibrary.vue'),
     },
