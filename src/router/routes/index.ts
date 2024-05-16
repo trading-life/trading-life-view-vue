@@ -12,6 +12,17 @@ const routeModuleList: AppRouteModule[] = [];
 
 // 加入到路由集合中
 Object.keys(modules).forEach((key) => {
+  //路由过滤
+  if (
+    key.includes('/modules/demo') ||
+    key.includes('/modules/about') ||
+    key.includes('/modules/hooks') ||
+    key.includes('/modules/form-design') ||
+    key.includes('/modules/dashboard')
+  ) {
+    return;
+  }
+  console.log(key);
   const mod = (modules as Recordable)[key].default || {};
   const modList = Array.isArray(mod) ? [...mod] : [mod];
   routeModuleList.push(...modList);
