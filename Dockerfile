@@ -5,7 +5,7 @@ MAINTAINER Adoin 'adoin@qq.com'
 WORKDIR /app
 COPY . ./
 # 设置 node 阿里镜像
-RUN npm config set registry https://registry.npmmirror.com
+RUN npm config set registry http://192.168.137.1:8007/repository/npm-public
 # 设置--max-old-space-size
 ENV NODE_OPTIONS=--max-old-space-size=16384
 # 设置阿里镜像、pnpm、依赖、编译
