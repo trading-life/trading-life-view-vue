@@ -51,7 +51,7 @@ const setting: ProjectConfig = {
   contentMode: ContentEnum.FULL,
 
   // Whether to display the logo
-  showLogo: true,
+  showLogo: false,
 
   // Whether to show footer
   showFooter: false,
@@ -63,7 +63,7 @@ const setting: ProjectConfig = {
     // Fixed at the top
     fixed: true,
     // Whether to show top
-    show: true,
+    show: false,
     // theme
     theme: ThemeEnum.LIGHT,
     // Whether to enable the lock screen function
@@ -99,7 +99,7 @@ const setting: ProjectConfig = {
     // Whether to show dom
     hidden: false,
     // Menu width
-    menuWidth: 210,
+    menuWidth: 180,
     // Menu mode
     mode: MenuModeEnum.INLINE,
     // Menu type
@@ -111,7 +111,7 @@ const setting: ProjectConfig = {
     // Top menu layout
     topMenuAlign: 'center',
     // Fold trigger position
-    trigger: TriggerEnum.HEADER,
+    trigger: TriggerEnum.FOOTER,
     // Turn on accordion mode, only show a menu
     accordion: true,
     // Switch page to close menu
@@ -153,7 +153,7 @@ const setting: ProjectConfig = {
     openPageLoading: true,
 
     // Whether to open the top progress bar
-    openNProgress: false,
+    openNProgress: true,
   },
 
   // Whether to enable KeepAlive cache is best to close during development, otherwise the cache needs to be cleared every time
