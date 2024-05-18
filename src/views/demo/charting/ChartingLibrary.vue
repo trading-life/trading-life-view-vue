@@ -63,13 +63,14 @@
 
   onMounted(() => {
     const widgetOptions = {
+      timezone: 'Asia/Shanghai',
       symbol: props.symbol,
       datafeed: new window.Datafeeds.UDFCompatibleDatafeed(props.datafeedUrl),
       interval: props.interval,
       container: chartContainer.value,
       library_path: props.libraryPath,
 
-      locale: getLanguageFromURL() || 'en',
+      locale: getLanguageFromURL() || 'zh',
       disabled_features: ['use_localstorage_for_settings'],
       enabled_features: ['study_templates'],
       charts_storage_url: props.chartsStorageUrl,
@@ -79,6 +80,22 @@
       fullscreen: props.fullscreen,
       autosize: props.autosize,
       studies_overrides: props.studiesOverrides,
+      // eslint-disable-next-line no-dupe-keys
+      disabled_features: [
+        'use_localstorage_for_settings',
+        'open_account_manager',
+        'trading_account_manager',
+      ],
+      // eslint-disable-next-line no-dupe-keys
+      enabled_features: [
+        'hide_right_toolbar',
+        'tick_resolution',
+        'chart_template_storage',
+        'hide_left_toolbar_by_default',
+        'study_templates',
+        'pre_post_market_sessions',
+        'show_object_tree',
+      ],
     };
     chartWidget = new widget(widgetOptions);
 
