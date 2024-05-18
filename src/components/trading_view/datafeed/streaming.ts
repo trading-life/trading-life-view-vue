@@ -94,7 +94,7 @@ export function subscribeOnStream(
   onResetCacheNeededCallback: () => void,
   lastDailyBar: any,
 ) {
-  const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
+  const parsedSymbol = parseFullSymbol(symbolInfo.ticker);
   const channelString = `0~${parsedSymbol.exchange}~${parsedSymbol.fromSymbol}~${parsedSymbol.toSymbol}`;
   const handler = {
     id: subscriberUID,

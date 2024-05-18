@@ -4,8 +4,9 @@
 <script setup>
   import { onMounted, ref, onUnmounted } from 'vue';
 
-  import Datafeed from '@/trading_view/datafeed/datafeed';
+  import Datafeed from '@/components/trading_view/datafeed/datafeed';
 
+  import { isFirst } from '@/api/tradingview/tradingview';
   import { widget } from '@/charting_library';
 
   function getLanguageFromURL() {
@@ -33,7 +34,7 @@
       type: String,
     },
     chartsStorageApiVersion: {
-      default: '1.1',
+      default: '1.0',
       type: String,
     },
     clientId: {
@@ -41,7 +42,7 @@
       type: String,
     },
     userId: {
-      default: 'public_user_id',
+      default: '1',
       type: String,
     },
     fullscreen: {
@@ -60,10 +61,12 @@
   const chartContainer = ref();
   let chartWidget;
 
-  onMounted(() => {
+  onMounted(async () => {
+    const isFirstIn = await isFirst({ clientId: props.clientId });
+
     const widgetOptions = {
       timezone: 'Asia/Shanghai',
-      symbol: props.symbol,
+      load_last_chart: true,
       datafeed: Datafeed,
       interval: props.interval,
       container: chartContainer.value,
@@ -88,14 +91,25 @@
       // eslint-disable-next-line no-dupe-keys
       enabled_features: [
         'hide_right_toolbar',
+        'pre_post_market_sessions',
+        'show_symbol_logos',
+        'show_exchange_logos',
+        'seconds_resolution',
         'tick_resolution',
         'chart_template_storage',
+        'secondary_series_extend_time_scale',
+        'show_percent_option_for_right_margin',
+        'display_data_mode',
+        'items_favoriting',
         'hide_left_toolbar_by_default',
         'study_templates',
         'pre_post_market_sessions',
         'show_object_tree',
       ],
     };
+    if (isFirstIn) {
+      widgetOptions.symbol = 'SH:600000/RMB';
+    }
     chartWidget = new widget(widgetOptions);
 
     chartWidget.onChartReady(() => {
@@ -117,6 +131,13 @@
         );
 
         button.innerHTML = 'Check API';
+
+        var button1 = chartWidget.createButton();
+        button1.setAttribute('title', 'My custom button tooltip');
+        button1.addEventListener('click', function () {
+          chartWidget.activeChart().executeActionById('drawingToolbarAction');
+        });
+        button1.textContent = '绘图';
       });
     });
   });
