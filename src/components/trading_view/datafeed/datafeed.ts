@@ -1,10 +1,28 @@
-import { makeApiRequest, generateSymbol, parseFullSymbol } from './helpers.js';
+import { makeApiRequest, generateSymbol, parseFullSymbol } from './helper';
 import { subscribeOnStream, unsubscribeFromStream } from './streaming.js';
 
-const lastBarsCache = new Map();
+import { stockSearch, getDayWeekYearData } from '@/api/tradingview/tradingview';
 
-// DatafeedConfiguration implementation
-const configurationData = {
+const lastBarsCache = new Map<string, any>();
+
+interface Exchange {
+  value: string;
+  name: string;
+  desc: string;
+}
+
+interface SymbolType {
+  name: string;
+  value: string;
+}
+
+interface ConfigurationData {
+  supported_resolutions: string[];
+  exchanges: Exchange[];
+  symbols_types: SymbolType[];
+}
+
+const configurationData: ConfigurationData = {
   // Represents the resolutions for bars supported by your datafeed
   supported_resolutions: ['1D', '1W', '1M'],
 
@@ -12,7 +30,9 @@ const configurationData = {
   exchanges: [
     {
       value: 'Bitfinex',
+      // Filter name
       name: 'Bitfinex',
+      // Full exchange name displayed in the filter popup
       desc: 'Bitfinex',
     },
     {
@@ -33,7 +53,7 @@ const configurationData = {
 };
 
 // Obtains all symbols for all exchanges supported by CryptoCompare API
-async function getAllSymbols() {
+async function getAllSymbols(): Promise<any[]> {
   const data = await makeApiRequest('data/v3/all/exchanges');
   let allSymbols = [];
 
@@ -58,12 +78,17 @@ async function getAllSymbols() {
 }
 
 export default {
-  onReady: (callback) => {
+  onReady: (callback: (data: ConfigurationData) => void) => {
     console.log('[onReady]: Method call');
     setTimeout(() => callback(configurationData));
   },
 
-  searchSymbols: async (userInput, exchange, symbolType, onResultReadyCallback) => {
+  searchSymbols: async (
+    userInput: string,
+    exchange: string,
+    symbolType: string,
+    onResultReadyCallback: (symbols: any[]) => void,
+  ) => {
     console.log('[searchSymbols]: Method call');
     const symbols = await getAllSymbols();
     const newSymbols = symbols.filter((symbol) => {
@@ -76,10 +101,10 @@ export default {
   },
 
   resolveSymbol: async (
-    symbolName,
-    onSymbolResolvedCallback,
-    onResolveErrorCallback,
-    extension,
+    symbolName: string,
+    onSymbolResolvedCallback: (symbolInfo: any) => void,
+    onResolveErrorCallback: (error: string) => void,
+    extension: any,
   ) => {
     console.log('[resolveSymbol]: Method call', symbolName);
     const symbols = await getAllSymbols();
@@ -105,17 +130,26 @@ export default {
       has_weekly_and_monthly: false,
       supported_resolutions: configurationData.supported_resolutions,
       volume_precision: 2,
-      data_status: 'streaming',
+      data_status: 'treaming',
     };
 
     console.log('[resolveSymbol]: Symbol resolved', symbolName);
     onSymbolResolvedCallback(symbolInfo);
   },
 
-  getBars: async (symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) => {
+  getBars: async (
+    symbolInfo: any,
+    resolution: string,
+    periodParams: any,
+    onHistoryCallback: (bars: any[], options: any) => void,
+    onErrorCallback: (error: any) => void,
+  ) => {
     const { from, to, firstDataRequest } = periodParams;
     console.log('[getBars]: Method call', symbolInfo, resolution, from, to);
     const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
+    if (!parsedSymbol) {
+      return [];
+    }
     const urlParameters = {
       e: parsedSymbol.exchange,
       fsym: parsedSymbol.fromSymbol,
@@ -166,11 +200,11 @@ export default {
   },
 
   subscribeBars: (
-    symbolInfo,
-    resolution,
-    onRealtimeCallback,
-    subscriberUID,
-    onResetCacheNeededCallback,
+    symbolInfo: any,
+    resolution: string,
+    onRealtimeCallback: (bar: any) => void,
+    subscriberUID: string,
+    onResetCacheNeededCallback: () => void,
   ) => {
     console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
     subscribeOnStream(
@@ -183,7 +217,7 @@ export default {
     );
   },
 
-  unsubscribeBars: (subscriberUID) => {
+  unsubscribeBars: (subscriberUID: string) => {
     console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID);
     unsubscribeFromStream(subscriberUID);
   },

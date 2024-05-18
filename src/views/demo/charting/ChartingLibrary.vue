@@ -4,6 +4,8 @@
 <script setup>
   import { onMounted, ref, onUnmounted } from 'vue';
 
+  import Datafeed from '@/trading_view/datafeed/datafeed';
+
   import { widget } from '@/charting_library';
 
   function getLanguageFromURL() {
@@ -21,16 +23,13 @@
       default: 'D',
       type: String,
     },
-    datafeedUrl: {
-      default: 'https://demo_feed.tradingview.com',
-      type: String,
-    },
     libraryPath: {
       default: '/charting_library/',
       type: String,
     },
     chartsStorageUrl: {
-      default: 'https://saveload.tradingview.com',
+      // default: 'http://localhost:10008/tradingview',
+      default: '/basic-api/tradingview',
       type: String,
     },
     chartsStorageApiVersion: {
@@ -65,7 +64,7 @@
     const widgetOptions = {
       timezone: 'Asia/Shanghai',
       symbol: props.symbol,
-      datafeed: new window.Datafeeds.UDFCompatibleDatafeed(props.datafeedUrl),
+      datafeed: Datafeed,
       interval: props.interval,
       container: chartContainer.value,
       library_path: props.libraryPath,

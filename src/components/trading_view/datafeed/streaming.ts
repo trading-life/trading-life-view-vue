@@ -1,7 +1,15 @@
-import { parseFullSymbol, apiKey } from './helpers.js';
+import { parseFullSymbol, apiKey } from './helper';
 
 const socket = new WebSocket('wss://streamer.cryptocompare.com/v2?api_key=' + apiKey);
-const channelToSubscription = new Map();
+const channelToSubscription = new Map<
+  string,
+  {
+    subscriberUID: string;
+    resolution: string;
+    lastDailyBar: any;
+    handlers: { id: string; callback: (bar: any) => void }[];
+  }
+>();
 
 socket.addEventListener('open', () => {
   console.log('[socket] Connected');
@@ -41,7 +49,13 @@ socket.addEventListener('message', (event) => {
   const lastDailyBar = subscriptionItem.lastDailyBar;
   const nextDailyBarTime = getNextDailyBarTime(lastDailyBar.time);
 
-  let bar;
+  let bar: {
+    time: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
   if (tradeTime >= nextDailyBarTime) {
     bar = {
       time: nextDailyBarTime,
@@ -66,19 +80,19 @@ socket.addEventListener('message', (event) => {
   subscriptionItem.handlers.forEach((handler) => handler.callback(bar));
 });
 
-function getNextDailyBarTime(barTime) {
+function getNextDailyBarTime(barTime: number): number {
   const date = new Date(barTime * 1000);
   date.setDate(date.getDate() + 1);
   return date.getTime() / 1000;
 }
 
 export function subscribeOnStream(
-  symbolInfo,
-  resolution,
-  onRealtimeCallback,
-  subscriberUID,
-  onResetCacheNeededCallback,
-  lastDailyBar,
+  symbolInfo: { full_name: string },
+  resolution: string,
+  onRealtimeCallback: (bar: any) => void,
+  subscriberUID: string,
+  onResetCacheNeededCallback: () => void,
+  lastDailyBar: any,
 ) {
   const parsedSymbol = parseFullSymbol(symbolInfo.full_name);
   const channelString = `0~${parsedSymbol.exchange}~${parsedSymbol.fromSymbol}~${parsedSymbol.toSymbol}`;
@@ -107,7 +121,7 @@ export function subscribeOnStream(
   socket.send(JSON.stringify(subRequest));
 }
 
-export function unsubscribeFromStream(subscriberUID) {
+export function unsubscribeFromStream(subscriberUID: string) {
   // Find a subscription with id === subscriberUID
   for (const channelString of channelToSubscription.keys()) {
     const subscriptionItem = channelToSubscription.get(channelString);
